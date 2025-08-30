@@ -109,6 +109,8 @@ Após executar todas as implementações, os tempos de execução foram coletado
 
 _Obs.: Cada arquivo foi executado 3 vezes para maior veracidade._
 
+![alt text](img/tempos_execucao.png)
+
 ![alt text](img/tabela_resultados_brutos.png)
 
 **Tabela de Tempos de Execução (Média)**
