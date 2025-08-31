@@ -135,7 +135,7 @@ _Observação: Foi executado cada versão algumas vezes para obter uma média de
 
 | Implementação | Nº de Threads | Tempo Médio (ms) | Speedup                 |
 | ------------- | ------------- | ---------------- | ----------------------- |
-| Sequencial    | 1             | 914,1            | -                       |
+| Sequencial    | 1             | 914,1            | 1,00x                   |
 | Paralelo      | 5             | 399,6            | Aprox. 2,29 mais rápido |
 | Paralelo      | 10            | 364,1            | Aprox. 2,51 mais rápido |
 
