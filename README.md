@@ -72,17 +72,17 @@ Para as versões paralelas, a estratégia adotada foi a de **Divisão Dinâmica 
 
 - **Thread Principal (Orquestradora):**
 
-  1.  Lê todos os números para uma lista compartilhada (`allNumbers`).
+1.  Lê todos os números para uma lista compartilhada (`allNumbers`).
 
-  2.  Cria um `Map` sincronizado (`primeResults`) para armazenar os primos encontrados de forma segura (thread-safe). O uso de um `Map<Índice, Número>` é crucial para resolver o desafio de **manter a ordem original** dos resultados.
+2.  Cria um `Map` sincronizado (`primeResults`) para armazenar os primos encontrados de forma segura (thread-safe). O uso de um `Map<Índice, Número>` é crucial para resolver o desafio de **manter a ordem original** dos resultados.
 
-  3.  Cria um contador atômico (`AtomicInteger`) que servirá para que as threads "peguem" o próximo número a ser processado. **Optei por** `Collections.synchronizedMap` e `AtomicInteger ` **por serem mecanismos de alto nível, eficientes e seguros para operações atômicas específicas (acesso ao mapa de resultados e incremento do contador), evitando a complexidade de blocos** `synchronized` **manuais para estas tarefas.**
+3.  Cria um contador atômico (`AtomicInteger`) que servirá para que as threads "peguem" o próximo número a ser processado. **Optei por** `Collections.synchronizedMap` e `AtomicInteger ` **por serem mecanismos de alto nível, eficientes e seguros para operações atômicas específicas (acesso ao mapa de resultados e incremento do contador), evitando a complexidade de blocos** `synchronized` **manuais para estas tarefas.**
 
-  4.  Inicia o número de threads (5 ou 10), onde cada thread recebe uma instância da tarefa `PrimeWorker`.
+4.  Inicia o número de threads (5 ou 10), onde cada thread recebe uma instância da tarefa `PrimeWorker`.
 
-  5.  Após iniciar todas as threads, a thread principal fica em estado de espera, utilizando o método `thread.join()`, aguardando a finalização de todas as workers.
+5.  Após iniciar todas as threads, a thread principal fica em estado de espera, utilizando o método `thread.join()`, aguardando a finalização de todas as workers.
 
-  6.  Quando todas as workers terminam, a thread principal reconstrói a lista de primos na ordem correta a partir do `Map` e a salva no arquivo de saída `primos_paralelo5.txt` ou `primos_paralelo10.txt`.
+6.  Quando todas as workers terminam, a thread principal reconstrói a lista de primos na ordem correta a partir do `Map` e a salva no arquivo de saída `primos_paralelo5.txt` ou `primos_paralelo10.txt`.
 
 - **Threads de Trabalho (`PrimeWorker`):**
 
