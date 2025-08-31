@@ -46,6 +46,8 @@ O projeto está organizado da seguinte forma:
 
   - `Analise_Desempenho.xlsx`: Planilha com a tabela de tempos e o gráfico comparativo.
 
+  - `executar_testes.bat`: Script de testes para rodar cada arquivo quantas vezes for necessário, somente inserindo no "for" a quantidade necessária para testes.
+
   - `README.md`: Este relatório.
 
 ## 3. Estratégia de Implementação
@@ -133,17 +135,17 @@ _Observação: Foi executado cada versão algumas vezes para obter uma média de
 
 | Implementação | Nº de Threads | Tempo Médio (ms) | Speedup                 |
 | ------------- | ------------- | ---------------- | ----------------------- |
-| Sequencial    | 1             | 1004             | -                       |
-| Paralelo      | 5             | 394              | Aprox. 2,55 mais rápido |
-| Paralelo      | 10            | 396              | Aprox. 2,54 mais rápido |
+| Sequencial    | 1             | 914,1            | -                       |
+| Paralelo      | 5             | 399,6            | Aprox. 2,29 mais rápido |
+| Paralelo      | 10            | 364,1            | Aprox. 2,51 mais rápido |
 
 _O **Speedup** é calculado como: (Tempo Sequencial) / (Tempo Paralelo)._
 
 Então:
 
-- 1004 / 394 = 2,55x
+- 914,1 / 399,6 = 2,29x
 
-- 1004 / 396 = 2,54x
+- 914,1 / 364,1 = 2,51x
 
 ![alt text](img/grafico_desempenho.png)
 
@@ -153,17 +155,17 @@ Então:
 
 A análise dos dados demonstra dois pontos principais:
 
-- **A paralelização resultou em um ganho de performance significativo**. A implementação sequencial levou em média **1004 ms**, enquanto a versão com 5 threads reduziu esse tempo para **394 ms**, um **speedup de 2,55 vezes**. Isso comprova que a estratégia de dividir o trabalho entre múltiplos processadores foi altamente eficaz.
+- **O Salto Inicial para o Paralelismo**: A transição da execução sequencial (914,1 ms) para a paralela com 5 threads (397,6 ms) gerou um ganho de performance expressivo, resultando em um **speedup de 2,30 vezes**. Isso comprova a eficácia da paralelização.
 
-- Observa-se um **platô de desempenho ao aumentar o número de threads de 5 para 10**. A versão com 10 threads teve um tempo médio de **396 ms**, ligeiramente superior à de 5 threads. Isso indica que simplesmente adicionar mais workers não garantiu uma melhoria, introduzindo, na verdade, uma pequena sobrecarga (overhead).
+- **Retornos Decrescentes com Mais Threads**: Ao dobrar o número de workers para 10 threads, o desempenho continuou a melhorar, atingindo uma média de **364,1 ms** e um **speedup de 2,51 vezes**. No entanto, é crucial notar que o ganho adicional foi muito menor que o salto inicial. Passar de 1 para 5 threads reduziu o tempo em mais de 500 ms, enquanto passar de 5 para 10 threads reduziu o tempo em apenas 33,5 ms. Este fenômeno é conhecido como **lei dos retornos decrescentes**.
 
 ## 7. Correlação com o Hardware de Teste
 
-A explicação para o platô de desempenho encontrado está diretamente ligada às especificações do hardware utilizado para os testes. O processador, um **Intel Core i7 8550U**, possui **4 núcleos físicos e 8 threads lógicas**. Isso significa que:
+A explicação para os retornos decrescentes está diretamente ligada às especificações do hardware. O processador, um **Intel Core i7 8550U**, possui **4 núcleos físicos e 8 threads lógicas**.
 
-- A versão com **5 threads** utilizou os recursos de hardware de forma muito eficiente, pois o sistema operacional pôde alocar cada thread para um dos 8 processadores lógicos disponíveis.
+- A versão com **5 threads** já consegue ocupar boa parte da capacidade de processamento paralelo do CPU.
 
-- A versão com **10 threads**, por outro lado, criou mais tarefas do que o processador consegue executar simultaneamente. Isso força o sistema a realizar **"trocas de contexto"** constantes para gerenciar as threads excedentes, gerando um custo operacional que anula e até reverte os potenciais ganhos.
+- A versão com **10 threads** excede o número de processadores lógicos disponíveis (8). Embora o sistema operacional consiga gerenciar essas threads e extrair um pouco mais de performance, ele o faz à custa de um aumento na sobrecarga (overhead) de troca de contexto, pois precisa revezar mais de uma thread em um mesmo núcleo lógico. Isso explica por que o ganho de desempenho foi pequeno e não linear.
 
 Informações do Hardware testado (meu notebook pessoal):
 
@@ -171,4 +173,4 @@ Informações do Hardware testado (meu notebook pessoal):
 
 ## 8. Conclusão
 
-Com essa análise, podemos comprovar que, embora a paralelização seja uma ferramenta poderosa para otimização, seu ganho é intrinsecamente limitado pela arquitetura do hardware. **Para este cenário, a configuração com 5 threads representou o ponto ótimo de desempenho, utilizando eficientemente os recursos do processador sem incorrer no custo de gerenciamento excessivo de threads**.
+A análise comprova que a paralelização é uma ferramenta poderosa, mas seus benefícios não escalam infinitamente. Existe um ponto ótimo que depende da arquitetura do hardware e da natureza da tarefa. Para este cenário, aumentar o número de threads de 5 para 10 trouxe uma melhoria marginal, demonstrando que a maior parte do ganho de performance já havia sido obtida ao utilizar um número de threads próximo à capacidade de paralelismo do processador.
