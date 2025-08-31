@@ -143,6 +143,8 @@ _O **Speedup** é calculado como: (Tempo Sequencial) / (Tempo Paralelo)._
 
 Então:
 
+- 914,1 / 914,1 = 1,00x
+
 - 914,1 / 399,6 = 2,29x
 
 - 914,1 / 364,1 = 2,51x
