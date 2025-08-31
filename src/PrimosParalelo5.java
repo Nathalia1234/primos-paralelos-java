@@ -22,20 +22,21 @@ public class PrimosParalelo5 {
 
     public static void main(String[] args) {
         // --- CONFIGURAÇÃO ---
-        String inputFile = "input/Entrada01.txt";
-        String outputFile = "output/primos_paralelo5.txt";
-        String resultsFile = "results/tempos_execucao.csv";
+        String inputFile = "input/Entrada01.txt";// Caminho do arquivo de entrada
+        String outputFile = "output/primos_paralelo5.txt";// Caminho do arquivo de saída
+        String resultsFile = "results/tempos_execucao.csv";// Caminho do arquivo de resultados
 
-        System.out.println("Iniciando processamento paralelo com " + NUM_THREADS + " threads...");
         
-        long startTime = System.nanoTime();
+        System.out.println("Iniciando processamento paralelo com " + NUM_THREADS + " threads...");
+
+        long startTime = System.nanoTime();// Marca o tempo de início
 
         try {
             // --- 1. LEITURA DO ARQUIVO ---
-            Path inputPath = Paths.get(inputFile);
-            List<Long> allNumbers = Files.lines(inputPath)
-                                         .map(Long::parseLong)
-                                         .collect(Collectors.toList());
+            Path inputPath = Paths.get(inputFile);// Caminho do arquivo de entrada
+            List<Long> allNumbers = Files.lines(inputPath)// Lê todas as linhas do arquivo
+                                         .map(Long::parseLong)// Converte cada linha para Long
+                                         .collect(Collectors.toList());// Coleta os resultados em uma lista
 
             // --- 2. PREPARAR RECURSOS COMPARTILHADOS ---
             // Usamos um Map sincronizado para que as threads possam inserir resultados
@@ -45,13 +46,13 @@ public class PrimosParalelo5 {
             AtomicInteger nextNumberIndex = new AtomicInteger(0);
 
             // --- 3. CRIAR E INICIAR AS THREADS ---
-            List<Thread> threads = new ArrayList<>();
-            for (int i = 0; i < NUM_THREADS; i++) {
+            List<Thread> threads = new ArrayList<>();// Lista para armazenar as threads
+            for (int i = 0; i < NUM_THREADS; i++) {// Cria e inicia as threads
                 // Criamos uma instância do nosso Worker.
                 Runnable worker = new PrimeWorker(allNumbers, primeResults, nextNumberIndex);
                 // Criamos a Thread, passando o Worker como tarefa.
                 Thread thread = new Thread(worker);
-                threads.add(thread);
+                threads.add(thread);// Adiciona a thread à lista
                 // O método start() agenda a thread para ser executada pela JVM.
                 thread.start();
             }
@@ -59,40 +60,40 @@ public class PrimosParalelo5 {
             // --- 4. ESPERAR TODAS AS THREADS TERMINAREM ---
             // A thread 'main' chama o método join() para cada thread worker.
             // Isso faz com que a 'main' pause e espere a finalização da outra thread.
-            for (Thread thread : threads) {
+            for (Thread thread : threads) {// Espera a thread terminar
                 thread.join();
             }
 
             // --- 5. RECONSTRUIR A ORDEM E ESCREVER O RESULTADO ---
             // Como o Map não garante a ordem de iteração, precisamos reconstruir a lista
             // na ordem correta usando os índices que salvamos.
-            List<Long> sortedPrimes = new ArrayList<>();
-            for (int i = 0; i < allNumbers.size(); i++) {
-                if (primeResults.containsKey(i)) {
-                    sortedPrimes.add(primeResults.get(i));
+            List<Long> sortedPrimes = new ArrayList<>();// Lista para armazenar os primos encontrados
+            for (int i = 0; i < allNumbers.size(); i++) {// Itera sobre todos os números
+                if (primeResults.containsKey(i)) {// Verifica se o índice está presente no mapa
+                    sortedPrimes.add(primeResults.get(i));// Adiciona o número primo à lista
                 }
             }
 
-            Path outputPath = Paths.get(outputFile);
+            Path outputPath = Paths.get(outputFile);// Caminho do arquivo de saída
             Files.write(outputPath, sortedPrimes.stream()
-                                                .map(String::valueOf)
-                                                .collect(Collectors.toList()));
-            
-            long endTime = System.nanoTime();
-            long durationMs = (endTime - startTime) / 1_000_000;
+                                                .map(String::valueOf)// Converte cada número primo para String
+                                                .collect(Collectors.toList()));// Coleta os resultados em uma lista
+
+            long endTime = System.nanoTime();// Fim da medição de tempo
+            long durationMs = (endTime - startTime) / 1_000_000;// Convertendo para milissegundos
 
             System.out.println("Processamento paralelo (" + NUM_THREADS + " threads) concluído.");
             System.out.println("Tempo de execução: " + durationMs + " ms");
 
             // --- 6. GRAVAR TEMPO DE EXECUÇÃO ---
-            try (FileWriter fw = new FileWriter(resultsFile, true);
-                 PrintWriter pw = new PrintWriter(fw)) {
-                pw.println("Paralelo," + NUM_THREADS + "," + durationMs);
+            try (FileWriter fw = new FileWriter(resultsFile, true);// Modo "append"
+                 PrintWriter pw = new PrintWriter(fw)) {// Criação do PrintWriter
+                pw.println("Paralelo," + NUM_THREADS + "," + durationMs);// Grava o tempo de execução no arquivo CSV
             }
 
-        } catch (IOException | InterruptedException e) {
-            System.err.println("Ocorreu um erro: " + e.getMessage());
-            e.printStackTrace();
+        } catch (IOException | InterruptedException e) {// Captura exceções de I/O e interrupções
+            System.err.println("Ocorreu um erro: " + e.getMessage());// Mensagem de erro
+            e.printStackTrace();// Impressão da stack trace
         }
     }
 }

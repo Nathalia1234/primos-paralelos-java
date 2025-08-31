@@ -10,10 +10,14 @@
 
 ## 1. Objetivo do Projeto
 
-O objetivo deste trabalho é desenvolver e analisar o desempenho de um programa que verifica números primos a partir de um arquivo de entrada. Foram implementadas **três versões distintas** para fins comparativos:
+O objetivo deste trabalho é desenvolver e analisar o desempenho de um programa que verifica números primos a partir de um arquivo de entrada (Entrada01.txt).
+
+Foram implementadas **três versões distintas** para fins comparativos:
 
 1.  **Implementação Sequencial:** Utilizando uma única thread.
+
 2.  **Implementação Paralela:** Utilizando 5 threads.
+
 3.  **Implementação Paralela:** Utilizando 10 threads.
 
 O projeto visa demonstrar o ganho de performance (speedup) obtido com a utilização de programação paralela para tarefas computacionalmente intensivas e divisíveis.
@@ -23,28 +27,42 @@ O projeto visa demonstrar o ganho de performance (speedup) obtido com a utiliza�
 O projeto está organizado da seguinte forma:
 
 - **/input**: Contém o arquivo `Entrada01.txt` com a lista de números a serem processados.
+
 - **/output**: Contém os arquivos de saída com a lista de números primos encontrados por cada implementação.
+
 - **/results**: Contém o arquivo `tempos_execucao.csv` com os dados de tempo coletados.
-- **/src**: Contém todo o código-fonte Java.
+
+- **/src**: Contém todo o código-fonte Java:
+
   - `PrimeUtils.java`: Classe utilitária com o método `isPrime()`.
+
   - `PrimosSequencial.java`: Executável da versão de thread única.
+
   - `PrimeWorker.java`: Classe `Runnable` que define a tarefa a ser executada pelas threads.
+
   - `PrimosParalelo5.java`: Executável da versão com 5 threads.
+
   - `PrimosParalelo10.java`: Executável da versão com 10 threads.
-- `Analise_Desempenho.xlsx`: Planilha com a tabela de tempos e o gráfico comparativo.
-- `README.md`: Este relatório.
+
+  - `Analise_Desempenho.xlsx`: Planilha com a tabela de tempos e o gráfico comparativo.
+
+  - `README.md`: Este relatório.
 
 ## 3. Estratégia de Implementação
 
 ### 3.1. Versão Sequencial
 
-A abordagem sequencial é a mais simples e serve como nossa linha de base (baseline) para comparação de desempenho.
+A abordagem sequencial é a mais simples e serve como nossa linha de base para comparação de desempenho.
 
 - A thread principal (`main`) é responsável por todo o fluxo.
-- Ela lê todos os números do arquivo de entrada para uma lista.
+
+- Ela lê todos os números do arquivo de entrada `input/Entrada01.txt` para uma lista.
+
 - Em seguida, itera sobre essa lista, número por número, chamando a função `PrimeUtils.isPrime()` para cada um.
+
 - Os números identificados como primos são adicionados a uma nova lista de resultados.
-- Ao final, a lista de resultados é gravada no arquivo de saída.
+
+- Ao final, a lista de resultados é gravada no arquivo de saída `output/primos_sequencial.txt`
 
 ### 3.2. Versão Paralela
 
@@ -56,13 +74,13 @@ Para as versões paralelas, a estratégia adotada foi a de **Divisão Dinâmica 
 
   2.  Cria um `Map` sincronizado (`primeResults`) para armazenar os primos encontrados de forma segura (thread-safe). O uso de um `Map<Índice, Número>` é crucial para resolver o desafio de **manter a ordem original** dos resultados.
 
-  3.  Cria um contador atômico (`AtomicInteger`) que servirá para que as threads "peguem" o próximo número a ser processado. **Optou-se por** `Collections.synchronizedMap` e `AtomicInteger ` **por serem mecanismos de alto nível, eficientes e seguros para operações atômicas específicas (acesso ao mapa de resultados e incremento do contador), evitando a complexidade de blocos** `synchronized` **manuais para estas tarefas.**
+  3.  Cria um contador atômico (`AtomicInteger`) que servirá para que as threads "peguem" o próximo número a ser processado. **Optei por** `Collections.synchronizedMap` e `AtomicInteger ` **por serem mecanismos de alto nível, eficientes e seguros para operações atômicas específicas (acesso ao mapa de resultados e incremento do contador), evitando a complexidade de blocos** `synchronized` **manuais para estas tarefas.**
 
   4.  Inicia o número de threads (5 ou 10), onde cada thread recebe uma instância da tarefa `PrimeWorker`.
 
   5.  Após iniciar todas as threads, a thread principal fica em estado de espera, utilizando o método `thread.join()`, aguardando a finalização de todas as workers.
 
-  6.  Quando todas as workers terminam, a thread principal reconstrói a lista de primos na ordem correta a partir do `Map` e a salva no arquivo de saída.
+  6.  Quando todas as workers terminam, a thread principal reconstrói a lista de primos na ordem correta a partir do `Map` e a salva no arquivo de saída `primos_paralelo5.txt` ou `primos_paralelo10.txt`.
 
 - **Threads de Trabalho (`PrimeWorker`):**
 
@@ -101,13 +119,11 @@ Esta abordagem é eficiente porque threads que terminam de processar um número 
     java -cp bin PrimosParalelo10
     ```
 
-_Observação: Foi executado cada versão algumas vezes para obter uma média de tempo mais estável e assim criar um gráfico com mais performance._
-
 ## 5. Análise de Desempenho
 
 Após executar todas as implementações, os tempos de execução foram coletados no arquivo `results/tempos_execucao.csv` e consolidados abaixo.
 
-_Obs.: Cada arquivo foi executado 3 vezes para maior veracidade._
+_Observação: Foi executado cada versão algumas vezes para obter uma média de tempo mais estável e assim criar um gráfico com mais performance._
 
 ![alt text](img/tempos_execucao.png)
 
@@ -143,7 +159,7 @@ A análise dos dados demonstra dois pontos principais:
 
 ## 7. Correlação com o Hardware de Teste
 
-A explicação para o platô de desempenho encontrado está diretamente ligada às especificações do hardware utilizado para os testes. O processador, um **Intel Core i7 8550U**, possui **4 núcleos físicos e 8 threads lógicas** (devido ao Hyperthreading). Isso significa que:
+A explicação para o platô de desempenho encontrado está diretamente ligada às especificações do hardware utilizado para os testes. O processador, um **Intel Core i7 8550U**, possui **4 núcleos físicos e 8 threads lógicas**. Isso significa que:
 
 - A versão com **5 threads** utilizou os recursos de hardware de forma muito eficiente, pois o sistema operacional pôde alocar cada thread para um dos 8 processadores lógicos disponíveis.
 
@@ -155,4 +171,4 @@ Informações do Hardware testado (meu notebook pessoal):
 
 ## 8. Conclusão
 
-A análise comprova que, embora a paralelização seja uma ferramenta poderosa para otimização, seu ganho é intrinsecamente limitado pela arquitetura do hardware. Para este cenário, a configuração com 5 threads representou o ponto ótimo de desempenho, utilizando eficientemente os recursos do processador sem incorrer no custo de gerenciamento excessivo de threads.
+Com essa análise, podemos comprovar que, embora a paralelização seja uma ferramenta poderosa para otimização, seu ganho é intrinsecamente limitado pela arquitetura do hardware. **Para este cenário, a configuração com 5 threads representou o ponto ótimo de desempenho, utilizando eficientemente os recursos do processador sem incorrer no custo de gerenciamento excessivo de threads**.

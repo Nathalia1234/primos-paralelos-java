@@ -10,7 +10,7 @@ public class PrimeUtils {
      * * @param number O número a ser verificado.
      * @return true se o número for primo, false caso contrário.
      */
-    public static boolean isPrime(long number) {
+    public static boolean isPrime(long number) {// Verifica se um número é primo
         // Números menores ou iguais a 1 não são primos.
         if (number <= 1) {
             return false;
@@ -20,14 +20,14 @@ public class PrimeUtils {
         // apenas até a raiz quadrada do número. Se um número 'n' tem um divisor
         // maior que sua raiz quadrada, ele necessariamente terá um outro divisor
         // menor que sua raiz quadrada.
-        for (long i = 2; i * i <= number; i++) {
-            // Se o número for divisível por 'i', então não é primo.
-            if (number % i == 0) {
-                return false;
+        for (long i = 2; i * i <= number; i++) {// Verifica possíveis divisores
+            
+            if (number % i == 0) { // Se o número for divisível por 'i', então não é primo.
+                return false; // O número não é primo.
             }
         }
         
         // Se o loop terminar sem encontrar divisores, o número é primo.
-        return true;
+        return true; 
     }
 }
